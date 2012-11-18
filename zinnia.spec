@@ -4,6 +4,7 @@
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	Online handwriting recognition system with machine learning
+Summary(pl.UTF-8):	System rozpoznawania pisma ręcznego z uczeniem maszynowym
 Name:		zinnia
 Version:	0.06
 Release:	1
@@ -17,10 +18,12 @@ Source2:	Makefile.tomoe
 Patch0:		%{name}-gcc.patch
 URL:		http://zinnia.sourceforge.net/
 BuildRequires:	db-devel
-BuildRequires:	perl(ExtUtils::MakeMaker)
+BuildRequires:	libstdc++-devel
+BuildRequires:	perl-ExtUtils-MakeMaker
 BuildRequires:	perl-devel >= 1:5.8.0
 BuildRequires:	python-devel
 BuildRequires:	rpm-perlprov >= 4.1-13
+# uses tomoe XMLs
 BuildRequires:	tomoe
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -34,68 +37,104 @@ portability, it has no rendering functionality. In addition to
 recognition, Zinnia provides a training module capable of creating
 highly efficient handwriting recognition models.
 
-This package contains the shared libraries.
+This package contains the shared library.
+
+%description -l pl.UTF-8
+Zinnia zapewnia prosty, konfigurowalny i przenośny system dynamicznego
+OCR do pisma ręcznego, oparty na SVM (Support Vector Machines).
+
+Zinnia odbiera uderzenia pióra jako dane o współrzędnych i przekazuje
+na wyjściu najlepiej pasujące znaki posortowane według ufności SVM.
+Aby zachować przenośność, nie ma funkcji renderowania. Poza
+rozpoznawaniem Zinnia udostępnia moduł trenujący, potrafiący tworzyć
+bardzo wydajne modele rozpoznawania pisma ręcznego.
+
+Ten pakiet zawiera bibliotekę współdzieloną.
 
 %package devel
-Summary:	Development files for zinnia
+Summary:	Header files for Zinnia library
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki Zinnia
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
-This package contains libraries and header files for developing
-applications that use zinnia.
+This package contains the header files for developing applications
+that use Zinnia.
 
-%package utils
-Summary:	Utils for the zinnia library
-Group:		Applications/System
-Requires:	%{name} = %{version}-%{release}
-
-%description utils
-This package provides utilities for zinnia library that use zinnia.
+%description devel -l pl.UTF-8
+Ten pakiet zawiera pliki nagłówkowe do tworzenia aplikacji
+wykorzystujących bibliotekę Zinnia.
 
 %package static
-Summary:	Static zinnia library
-Summary(pl.UTF-8):	Statyczna biblioteka zinnia
+Summary:	Static Zinnia library
+Summary(pl.UTF-8):	Statyczna biblioteka Zinnia
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
-Static zinnia library.
+Static Zinnia library.
 
 %description static -l pl.UTF-8
-Statyczna biblioteka zinnia.
+Statyczna biblioteka Zinnia.
 
-%package doc
-Summary:	Documents for the zinnia library
-Group:		Development/Libraries
+%package utils
+Summary:	Utils for the Zinnia library
+Summary(pl.UTF-8):	Programy narzędziowe do biblioteki Zinnia
+Group:		Applications/System
 Requires:	%{name} = %{version}-%{release}
 
+%description utils
+This package provides utilities for Zinnia library.
+
+%description utils -l pl.UTF-8
+Ten pakiet zawiera programy narzędziowe do biblioteki Zinnia.
+
+%package doc
+Summary:	Documents for the Zinnia library
+Summary(pl.UTF-8):	Dokumentacja do biblioteki Zinnia
+Group:		Documentation
+
 %description doc
-This package provide documents for zinnia library that use zinnia.
+This package provide documents for Zinnia library.
+
+%description doc -l pl.UTF-8
+Ten pakiet zawiera dokumentację do biblioteki Zinnia.
 
 %package -n perl-zinnia
-Summary:	Perl bindings for zinnia
-Group:		Development/Libraries
+Summary:	Perl bindings for Zinnia
+Summary(pl.UTF-8):	Wiązania Perla do biblioteki Zinnia
+Group:		Development/Languages/Perl
 Requires:	%{name} = %{version}-%{release}
 
 %description -n perl-zinnia
-This package contains perl bindings for zinnia.
+This package contains Perl bindings for Zinnia.
+
+%description -n perl-zinnia -l pl.UTF-8
+Ten pakiet zawiera wiązania Perla do biblioteki Zinnia.
 
 %package -n python-zinnia
 Summary:	Python bindings for zinnia
-Group:		Development/Libraries
+Summary(pl.UTF-8):	Wiązania Pythona do biblioteki Zinnia
+Group:		Development/Languages/Python
 Requires:	%{name} = %{version}-%{release}
 
 %description -n python-zinnia
-This package contains python bindings for zinnia.
+This package contains Python bindings for Zinnia.
+
+%description -n python-zinnia -l pl.UTF-8
+Ten pakiet zawiera wiązania Pythona do biblioteki Zinnia.
 
 %package tomoe
-Summary:	Tomoe model file for zinnia
+Summary:	Tomoe model files for Zinnia
+Summary(pl.UTF-8):	Pliki modelu Tomoe dla biblioteki Zinnia
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description tomoe
-This package contains tomoe model files for zinnia.
+This package contains Tomoe model files for Zinnia.
+
+%description tomoe -l pl.UTF-8
+Ten pakiet zawiera pliki modelu Tomoe dla biblioteki Zinnia.
 
 %prep
 %setup -q
@@ -130,7 +169,7 @@ cd ..
 
 cd python
 CC="%{__cc}" \
-CFLAGS="-I../ %{rpmcflags}" \
+CFLAGS="-I.. %{rpmcflags}" \
 LDFLAGS="-L../.libs %{rpmldflags}" \
 %{__python} setup.py build
 
@@ -143,10 +182,8 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -f Makefile.tomoe install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-cd perl
-%{__make} pure_install \
+%{__make} -C perl pure_install \
 	DESTDIR=$RPM_BUILD_ROOT
-cd ..
 
 cd python
 %{__python} setup.py install \
@@ -154,24 +191,28 @@ cd python
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
 
+%py_postclean
+
+# obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post	-p /sbin/ldconfig
+%postun	-p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
-%doc README
+%doc AUTHORS COPYING README
 %attr(755,root,root) %{_libdir}/libzinnia.so.*.*.*
-%attr(755,root,root) %{_libdir}/libzinnia.so.[0-9]
+%attr(755,root,root) %ghost %{_libdir}/libzinnia.so.0
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libzinnia.so
-%{_includedir}/zinnia*
+%{_includedir}/zinnia
+%{_includedir}/zinnia.h
 %{_pkgconfigdir}/zinnia.pc
 
 %if %{with static_libs}
@@ -192,15 +233,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n perl-zinnia
 %defattr(644,root,root,755)
-%dir %{perl_vendorarch}/auto/zinnia
-%attr(755,root,root) %{perl_vendorarch}/auto/zinnia/zinnia.so
 %{perl_vendorarch}/zinnia.pm
+%dir %{perl_vendorarch}/auto/zinnia
+%{perl_vendorarch}/auto/zinnia/zinnia.bs
+%attr(755,root,root) %{perl_vendorarch}/auto/zinnia/zinnia.so
 
 %files -n python-zinnia
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_zinnia.so
-%{py_sitedir}/zinnia.py*
-%{py_sitedir}/zinnia*.egg-info
+%{py_sitedir}/zinnia.py[co]
+%{py_sitedir}/zinnia_python-0.0.0-py*.egg-info
 
 %files tomoe
 %defattr(644,root,root,755)
