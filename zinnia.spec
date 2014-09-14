@@ -235,7 +235,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{perl_vendorarch}/zinnia.pm
 %dir %{perl_vendorarch}/auto/zinnia
-%{perl_vendorarch}/auto/zinnia/zinnia.bs
 %attr(755,root,root) %{perl_vendorarch}/auto/zinnia/zinnia.so
 
 %files -n python-zinnia
