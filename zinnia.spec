@@ -1,13 +1,15 @@
 #
 # Conditional build:
 %bcond_without	static_libs	# don't build static libraries
+%bcond_without	python2 # CPython 2.x module
+%bcond_with	python3 # CPython 3.x module
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	Online handwriting recognition system with machine learning
 Summary(pl.UTF-8):	System rozpoznawania pisma ręcznego z uczeniem maszynowym
 Name:		zinnia
 Version:	0.06
-Release:	6
+Release:	7
 License:	BSD
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/zinnia/%{name}-%{version}.tar.gz
@@ -124,6 +126,18 @@ This package contains Python bindings for Zinnia.
 %description -n python-zinnia -l pl.UTF-8
 Ten pakiet zawiera wiązania Pythona do biblioteki Zinnia.
 
+%package -n python3-zinnia
+Summary:	Python 3 bindings for zinnia
+Summary(pl.UTF-8):	Wiązania Pythona 3 do biblioteki Zinnia
+Group:		Development/Languages/Python
+Requires:	%{name} = %{version}-%{release}
+
+%description -n python3-zinnia
+This package contains Python 3 bindings for Zinnia.
+
+%description -n python3-zinnia -l pl.UTF-8
+Ten pakiet zawiera wiązania Pythona 3 do biblioteki Zinnia.
+
 %package tomoe
 Summary:	Tomoe model files for Zinnia
 Summary(pl.UTF-8):	Pliki modelu Tomoe dla biblioteki Zinnia
@@ -171,7 +185,14 @@ cd python
 CC="%{__cc}" \
 CFLAGS="-I.. %{rpmcflags}" \
 LDFLAGS="-L../.libs %{rpmldflags}" \
-%{__python} setup.py build
+%if %{with python2}
+%py_build
+%endif
+
+%if %{with python3}
+%py3_build
+%endif
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -186,12 +207,16 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 cd python
-%{__python} setup.py install \
-	--skip-build \
-	--optimize=2 \
-	--root=$RPM_BUILD_ROOT
+%if %{with python2}
+%py_install
 
 %py_postclean
+%endif
+
+%if %{with python3}
+%py3_install
+%endif
+
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
@@ -237,11 +262,21 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{perl_vendorarch}/auto/zinnia
 %attr(755,root,root) %{perl_vendorarch}/auto/zinnia/zinnia.so
 
+%if %{with python2}
 %files -n python-zinnia
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_zinnia.so
 %{py_sitedir}/zinnia.py[co]
 %{py_sitedir}/zinnia_python-0.0.0-py*.egg-info
+%endif
+
+%if %{with python3}
+%files -n python3-zinnia
+%defattr(644,root,root,755)
+%attr(755,root,root) %{py3_sitedir}/_zinnia.so
+%{py3_sitedir}/zinnia.py[co]
+%{py3_sitedir}/zinnia_python-0.0.0-py*.egg-info
+%endif
 
 %files tomoe
 %defattr(644,root,root,755)
