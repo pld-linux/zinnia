@@ -9,7 +9,7 @@ Summary:	Online handwriting recognition system with machine learning
 Summary(pl.UTF-8):	System rozpoznawania pisma ręcznego z uczeniem maszynowym
 Name:		zinnia
 Version:	0.06
-Release:	7
+Release:	8
 License:	BSD
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/zinnia/%{name}-%{version}.tar.gz
