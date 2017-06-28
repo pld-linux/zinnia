@@ -9,7 +9,7 @@ Summary:	Online handwriting recognition system with machine learning
 Summary(pl.UTF-8):	System rozpoznawania pisma ręcznego z uczeniem maszynowym
 Name:		zinnia
 Version:	0.06
-Release:	10
+Release:	11
 License:	BSD
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/zinnia/%{name}-%{version}.tar.gz
@@ -18,6 +18,7 @@ Source0:	http://downloads.sourceforge.net/zinnia/%{name}-%{version}.tar.gz
 Source1:	tomoe2s.pl
 Source2:	Makefile.tomoe
 Patch0:		%{name}-gcc.patch
+Patch1:		zinnia-fixes-gcc6-compile.patch
 URL:		http://zinnia.sourceforge.net/
 BuildRequires:	db-devel
 BuildRequires:	libstdc++-devel
@@ -153,6 +154,7 @@ Ten pakiet zawiera pliki modelu Tomoe dla biblioteki Zinnia.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %{__rm} python/zinnia.pyc
 
