@@ -4,7 +4,6 @@
 %bcond_without	python2 # CPython 2.x module
 %bcond_with	python3 # CPython 3.x module
 #
-%include	/usr/lib/rpm/macros.perl
 Summary:	Online handwriting recognition system with machine learning
 Summary(pl.UTF-8):	System rozpoznawania pisma ręcznego z uczeniem maszynowym
 Name:		zinnia
